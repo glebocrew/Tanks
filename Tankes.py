@@ -8,12 +8,14 @@ delta_y = 0
 InGame = True
 CANVAS_WIDTH = 1000
 CANVAS_HEIGHT = 800
-TANK_WIDTH = 117
-TANK_HEIGHT = 103
+TANK_WIDTH = 217
+TANK_HEIGHT = 127
+
+USSR_TANK_WIDTH = 119
+USSR_TANK_HEIGHT = 192
+
 USSR_TANK_X = 500
 USSR_TANK_Y = 700
-
-
 
 MISSLE_WIDTH = 41
 MISSLE_HEIGHT = 57
@@ -150,9 +152,9 @@ class Missle:
 
 tankUSSR = Tank(Coords(USSR_TANK_X, USSR_TANK_Y), TANK_WIDTH / 2,
                 'd:\\USERDATA\\Gleb\\Python\\Training\\res\\USSRTank.png', canvas)
-tankDeutsch1 = Tank(Coords(30, 150), TANK_WIDTH, 'd:\\USERDATA\\Gleb\\Python\\Training\\res\\GermanTank.png',
+tankDeutsch1 = Tank(Coords(30, 150), TANK_WIDTH / 2, 'd:\\USERDATA\\Gleb\\Python\\Training\\res\\GermanTank.png',
                     canvas)
-tankDeutsch2 = Tank(Coords(30, 350), TANK_WIDTH, 'd:\\USERDATA\\Gleb\\Python\\Training\\res\\GermanTank.png',
+tankDeutsch2 = Tank(Coords(30, 350), TANK_WIDTH / 2, 'd:\\USERDATA\\Gleb\\Python\\Training\\res\\GermanTank.png',
                     canvas)
 USSR_TANK_X_Y_2 = canvas.coords(tankUSSR)
 
@@ -161,18 +163,23 @@ tanks.append(tankDeutsch2)
 
 
 def Bang(event):
+    global USSR_TANK_X
     if event.keysym == 'Up':
-        new_missle = Missle(Coords(USSR_TANK_X,USSR_TANK_Y-60),
+        new_missle = Missle(Coords(USSR_TANK_X, USSR_TANK_Y - 60),
                             "d:\\USERDATA\\Gleb\\Python\\Training\\res\\MissleNew.png", canvas)
         missles.append(new_missle)
-    # elif event.keysym == 'Left':
-    #     tankUSSR.go(-5, 0)
-    #     tk.update()
-    #     t.sleep(0.01)
-    # elif event.keysym == 'Right':
-    #     tankUSSR.go(5, 0)
-    #     tk.update()
-    #     t.sleep(0.01)
+    elif event.keysym == 'Left':
+        if (USSR_TANK_X - 5 > USSR_TANK_WIDTH/2):
+            USSR_TANK_X = USSR_TANK_X - 5
+            tankUSSR.go(-5, 0)
+        tk.update()
+        t.sleep(0.01)
+    elif event.keysym == 'Right':
+        if (USSR_TANK_X + 5 < CANVAS_WIDTH - USSR_TANK_WIDTH/2):
+            tankUSSR.go(5, 0)
+            USSR_TANK_X = USSR_TANK_X + 5
+        tk.update()
+        t.sleep(0.01)
     else:
         pass
 
@@ -182,6 +189,9 @@ canvas.bind_all('<KeyPress-Left>', Bang)
 canvas.bind_all('<KeyPress-Right>', Bang)
 
 while InGame:
+
+    for current_missle in missles:
+        current_missle.fly(0, MISSLE_SPEED)
 
     for current_tank in tanks:
         current_tank.go(TANK_SPEED + randint(1, 4), 0)
@@ -195,9 +205,9 @@ while InGame:
                 current_missle.clear()
                 current_tank.explose()
                 tanks.remove(current_tank)
+                missles.remove(current_missle)
                 break
 
-            current_missle.fly(0, MISSLE_SPEED)
             if not current_missle.is_missle_in_battle_field():
                 print("Ракета улетела за пределы !")
                 current_missle.clear()

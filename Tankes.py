@@ -1,7 +1,7 @@
 from tkinter import *
 import time as t
 import math as math
-from random import randint
+from random import *
 
 delta_x = 0
 delta_y = 0
@@ -10,6 +10,10 @@ CANVAS_WIDTH = 1000
 CANVAS_HEIGHT = 800
 TANK_WIDTH = 117
 TANK_HEIGHT = 103
+USSR_TANK_X = 500
+USSR_TANK_Y = 700
+
+
 
 MISSLE_WIDTH = 41
 MISSLE_HEIGHT = 57
@@ -17,11 +21,15 @@ MISSLE_HEIGHT = 57
 TANK_SPEED = 2
 MISSLE_SPEED = 5
 
-USSR_TANK_X = 500
-USSR_TANK_Y = 700
+USSR_TANK_X_1 = 500
+USSR_TANK_Y_1 = 700
 
+Missles_images1 = "d:\\USERDATA\\Gleb\\Python\\Training\\res\\MissleNew.png"
+Missles_images2 = "d:\\USERDATA\\Gleb\\Python\\Training\\res\\MissleNew2.png"
+Missles_images3 = "d:\\USERDATA\\Gleb\\Python\\Training\\res\\MissleNew3.png"
 tk = Tk()
 tk.title("Game")
+tk.wm_attributes("-topmost")
 canvas = Canvas(tk, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, bd=1, bg='white')
 R_dETH = 20
 # It`s our GLOBALS
@@ -71,7 +79,6 @@ class Tank:
         tk.update()
         t.sleep(1)
 
-
     def draw(self):
         # self.canvas.delete(self.tankImage)
         # print(self.tankImage)
@@ -98,6 +105,8 @@ class Tank:
             self.coords.x = self.coords.x - delta_x
             self.coords.y = self.coords.y - delta_y
             self.canvas.move(self.tankImage, -delta_x, -delta_y)
+        USSR_TANK_X = delta_x
+        USSR_TANK_Y = delta_y
 
 
 def calc_distance(x1, y1, x2, y2):
@@ -139,35 +148,50 @@ class Missle:
             return False
 
 
-tankUSSR = Tank(Coords(USSR_TANK_X, USSR_TANK_Y), TANK_WIDTH / 2, 'd:\\USERDATA\\Gleb\\Python\\Training\\res\\USSRTank.png', canvas)
-tankDeutsch1 = Tank(Coords(30, 150), TANK_WIDTH / 2, 'd:\\USERDATA\\Gleb\\Python\\Training\\res\\GermanTank.png', canvas)
-tankDeutsch2 = Tank(Coords(30, 350), TANK_WIDTH / 2, 'd:\\USERDATA\\Gleb\\Python\\Training\\res\\GermanTank.png', canvas)
-
+tankUSSR = Tank(Coords(USSR_TANK_X, USSR_TANK_Y), TANK_WIDTH / 2,
+                'd:\\USERDATA\\Gleb\\Python\\Training\\res\\USSRTank.png', canvas)
+tankDeutsch1 = Tank(Coords(30, 150), TANK_WIDTH, 'd:\\USERDATA\\Gleb\\Python\\Training\\res\\GermanTank.png',
+                    canvas)
+tankDeutsch2 = Tank(Coords(30, 350), TANK_WIDTH, 'd:\\USERDATA\\Gleb\\Python\\Training\\res\\GermanTank.png',
+                    canvas)
+USSR_TANK_X_Y_2 = canvas.coords(tankUSSR)
 
 tanks.append(tankDeutsch1)
 tanks.append(tankDeutsch2)
 
+
 def Bang(event):
     if event.keysym == 'Up':
-        new_missle = Missle(Coords(USSR_TANK_X, USSR_TANK_Y-60), "d:\\USERDATA\\Gleb\\Python\\Training\\res\\MissleNew.png", canvas)
+        new_missle = Missle(Coords(USSR_TANK_X,USSR_TANK_Y-60),
+                            "d:\\USERDATA\\Gleb\\Python\\Training\\res\\MissleNew.png", canvas)
         missles.append(new_missle)
+    # elif event.keysym == 'Left':
+    #     tankUSSR.go(-5, 0)
+    #     tk.update()
+    #     t.sleep(0.01)
+    # elif event.keysym == 'Right':
+    #     tankUSSR.go(5, 0)
+    #     tk.update()
+    #     t.sleep(0.01)
     else:
         pass
 
 
 canvas.bind_all('<KeyPress-Up>', Bang)
+canvas.bind_all('<KeyPress-Left>', Bang)
+canvas.bind_all('<KeyPress-Right>', Bang)
 
 while InGame:
 
     for current_tank in tanks:
-        current_tank.go(TANK_SPEED + randint(1,4), 0)
+        current_tank.go(TANK_SPEED + randint(1, 4), 0)
         for current_missle in missles:
             if current_missle.check_is_tank_in_zone(current_tank):
                 if len(tanks) == 1:
                     InGame = False
                     canvas.create_text(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, fill='red',
-                                            font="Times 20 italic bold",
-                                            text="GAME OVER!!!\n YOU WIN!")
+                                       font="Times 20 italic bold",
+                                       text="GAME OVER!!!\n YOU WIN!")
                 current_missle.clear()
                 current_tank.explose()
                 tanks.remove(current_tank)
